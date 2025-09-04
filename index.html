@@ -9,7 +9,7 @@
   :root{
     --bg:#0e0e0e; --panel:#191919; --row:#222; --row-alt:#1e1e1e;
     --line:#313131; --text:#e6e6e6; --muted:#bfbfbf;
-    --orange:#c87200; --orange-dark:#9d5b00; --green:#4caf50;
+    --orange:#c87200; --green:#4caf50;
   }
   html,body{background:var(--bg); color:var(--text); margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans","Helvetica Neue",Arial;}
   .wrap{max-width:820px; margin:0 auto 60px; padding:0 16px;}
@@ -36,7 +36,7 @@
   .ok{ color:#d3ffd6; border-color:#2f5f34; background:#0b1a0d; }
 
   .chart-wrap{ padding:14px; }
-  canvas{ width:100%; height:280px; }
+  canvas{ width:100%; height:320px; }
 
   @media (max-width:640px){
     .grid{ grid-template-columns:1fr; }
@@ -82,8 +82,7 @@
       <div class="grid">
         <div class="cell"><label for="nåM2" class="label">Nåværende størrelse:</label></div>
         <div class="cell">
-          <input id="nåM2" type="number" inputmode="numeric" min="0" step="1" placeholder="0" />
-          <span class="muted">m²</span>
+          <input id="nåM2" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /> <span class="muted">m²</span>
         </div>
 
         <div class="cell"><span class="label">Mangler m²:</span></div>
@@ -127,28 +126,20 @@
         <div class="cell"><span class="label">Daglig inntekt (brutto):</span></div>
         <div class="cell"><span class="value" id="daglig">0 kr</span></div>
 
-        <div class="cell"><span class="label">Break-even:</span></div>
+        <div class="cell"><span class="label">Break-even (estimat):</span></div>
         <div class="cell"><span class="badge ok" id="breakeven">–</span></div>
-      </div>
 
-      <div class="grid">
-        <div class="cell"><span class="label">Etter 7 dager:</span></div>
-        <div class="cell"><span class="value" id="d7">0 kr</span></div>
+        <div class="cell"><span class="label">Maks størrelse nådd:</span></div>
+        <div class="cell"><span class="value" id="capreach">–</span></div>
 
-        <div class="cell"><span class="label">Etter 14 dager:</span></div>
-        <div class="cell"><span class="value" id="d14">0 kr</span></div>
-
-        <div class="cell"><span class="label">Etter 21 dager:</span></div>
-        <div class="cell"><span class="value" id="d21">0 kr</span></div>
-
-        <div class="cell"><span class="label">Etter 28 dager:</span></div>
-        <div class="cell"><span class="value" id="d28">0 kr</span></div>
+        <div class="cell"><span class="label">Daglig inntekt ved maks:</span></div>
+        <div class="cell"><span class="value" id="maxdaily">0 kr</span></div>
       </div>
 
       <div class="chart-wrap">
         <canvas id="profitChart" aria-label="Profittgraf" role="img"></canvas>
       </div>
-      <div class="hint">Grafen viser akkumulert <b>profitt</b> (inntekt − investering) over 0–30 dager. Med reinvest blir kurven konveks/økende.</div>
+      <div class="hint">Grafen viser akkumulert <b>profitt</b> (inntekt − startinvestering) over en dynamisk tidslinje. Reinvestering stopper automatisk ved <b>400&nbsp;000 m²</b>.</div>
     </section>
 
   </div>
@@ -182,115 +173,129 @@
     const investEl = document.getElementById('invest');
     const dagligEl = document.getElementById('daglig');
     const beEl = document.getElementById('breakeven');
-    const d7El = document.getElementById('d7');
-    const d14El = document.getElementById('d14');
-    const d21El = document.getElementById('d21');
-    const d28El = document.getElementById('d28');
+    const capreachEl = document.getElementById('capreach');
+    const maxdailyEl = document.getElementById('maxdaily');
 
-    // --- Kalkulator 1
+    // Kalkulator 1
     function calcK1(){
       const money = Math.max(0, +pengerEl.value || 0);
       const sets = Math.floor(money / SET_COST);
-      const m2 = sets;
-      const workers = sets*2;
-      const leftover = money - sets*SET_COST;
-      outArbeidereEl.textContent = n.format(workers);
-      outM2El.textContent = n.format(m2);
-      outOversEl.textContent = n.format(leftover) + ' kr';
+      outArbeidereEl.textContent = n.format(sets*2);
+      outM2El.textContent = n.format(sets);
+      outOversEl.textContent = n.format(money - sets*SET_COST) + ' kr';
     }
 
-    // --- Kalkulator 2
+    // Kalkulator 2
     function calcK2(){
       const curM2 = Math.max(0, +nåM2El.value || 0);
       const missM2 = Math.max(0, MAX_M2 - curM2);
-      const missWorkers = missM2 * 2;
-      const totalCost = missM2 * SET_COST;
       outMissM2El.textContent = n.format(missM2);
-      outMissWorkersEl.textContent = n.format(missWorkers);
-      outManglerEl.textContent = n.format(totalCost) + ' kr';
+      outMissWorkersEl.textContent = n.format(missM2*2);
+      outManglerEl.textContent = n.format(missM2*SET_COST) + ' kr';
     }
 
-    // --- Graf / ROI
+    // --- Chart
     let chart;
     function ensureChart(){
       if(chart) return chart;
       const ctx = document.getElementById('profitChart');
       chart = new Chart(ctx,{
         type:'line',
-        data:{ labels:[], datasets:[{ label:'Akkumulert profitt', data:[], tension:.2 }]},
+        data:{ labels:[], datasets:[
+          {label:'Akkumulert profitt', data:[], tension:.2, pointRadius:0}
+        ]},
         options:{
           responsive:true,
-          plugins:{ legend:{ display:false }},
+          plugins:{ legend:{ display:true }},
+          interaction:{ mode:'index', intersect:false },
           scales:{ x:{ grid:{ color:'#2a2a2a'}}, y:{ grid:{ color:'#2a2a2a'} } }
         }
       });
       return chart;
     }
 
-    // RIKTIG break-even + reinvestering
+    // Simuler serie (med/uten reinvest)
+    function simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest){
+      let sets = Math.min(MAX_M2, Math.max(0, m2));
+      const invest = sets * SET_COST;
+      const maxDailyIncome = MAX_M2 * gramsPerSetPerDay * pricePerGram;
+
+      const profit = [0];
+      let cash = 0;
+      let cumRevenue = 0;
+      let beDays = null;
+      let capDay = null;
+
+      for(let d=1; d<=365; d++){
+        const income = sets * gramsPerSetPerDay * pricePerGram;
+        cumRevenue += income;
+        cash += income;
+
+        if(reinvest){
+          // kjøp på slutten av dagen, men aldri over maks
+          if(cash >= SET_COST && sets < MAX_M2){
+            const canBuy = Math.floor(cash / SET_COST);
+            const room = MAX_M2 - sets;
+            const buy = Math.min(canBuy, room);
+            sets += buy;
+            cash -= buy * SET_COST;
+            if(sets === MAX_M2 && capDay === null) capDay = d;
+          }
+        }
+
+        if(beDays === null && cumRevenue >= invest){
+          const prevCum = cumRevenue - income;
+          const frac = (invest - prevCum) / income; // andel av dagen
+          beDays = (d - 1) + frac;
+        }
+
+        profit.push(cumRevenue - invest);
+      }
+
+      // velg opp til en smidig visningslengde
+      const horizon = Math.min(365, Math.max(60, Math.ceil(((beDays ?? 180)*1.25)+30)));
+      return {
+        labels: Array.from({length: horizon+1}, (_,i)=>i),
+        profit: profit.slice(0, horizon+1),
+        beDays, capDay, invest,
+        baseDaily: (m2 * gramsPerSetPerDay * pricePerGram),
+        maxDaily: maxDailyIncome
+      };
+    }
+
     function calcK3(){
       const m2 = Math.max(0, +roiSizeEl.value || 0);
       const pricePerGram = Math.max(0, +prisGramEl.value || 0);
       const gramsPerSetPerDay = Math.max(0, +yieldEl.value || 0);
-      const doReinvest = reinvestEl.checked;
+      const reinvest = reinvestEl.checked;
 
-      let sets = m2;                         // 1 m² = 1 sett
-      const invest = sets * SET_COST;        // startinvestering
-      investEl.textContent = n.format(invest) + ' kr';
+      const initialInvest = m2 * SET_COST;
+      investEl.textContent = n.format(initialInvest) + ' kr';
+      dagligEl.textContent = n.format(m2 * gramsPerSetPerDay * pricePerGram) + ' kr';
 
-      const baseDaily = sets * gramsPerSetPerDay * pricePerGram;
-      dagligEl.textContent = n.format(baseDaily) + ' kr';
-
-      const days = Array.from({length:31}, (_,i)=>i);
-      const profitSeries = [];
-
-      let cash = 0;          // kontanter for reinvestering
-      let cumRevenue = 0;    // akkumulert inntekt (for BE)
-      let beDays = null;     // desimal-dager til break-even
-
-      for(let d=0; d<=30; d++){
-        if(d>0){
-          const income = sets * gramsPerSetPerDay * pricePerGram;
-          cumRevenue += income;
-          cash += income;
-
-          // kjøp nye sett på slutten av dagen
-          if(doReinvest && cash >= SET_COST){
-            const buy = Math.floor(cash / SET_COST);
-            sets += buy;
-            cash -= buy * SET_COST;
-          }
-
-          // første gang inntekt >= investering -> break-even (interpolert)
-          if(beDays === null && cumRevenue >= invest){
-            const prevCum = cumRevenue - income;
-            const remain = invest - prevCum;
-            const frac = remain / income;
-            beDays = (d - 1) + frac;
-          }
-        }
-        profitSeries.push(cumRevenue - invest); // profitt = inntekt - investering
-      }
+      const sim = simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest);
 
       // Break-even tekst
       let beText = '–';
-      if(beDays !== null){
-        beText = beDays < 0.5 ? 'under 1 dag'
-                              : `${(Math.round(beDays*10)/10).toLocaleString('no-NO')} dager`;
+      if(sim.beDays !== null){
+        beText = sim.beDays < 0.5 ? 'under 1 dag' : `${(Math.round(sim.beDays*10)/10).toLocaleString('no-NO')} dager`;
       }
       beEl.textContent = beText;
 
-      // 7/14/21/28-dagers profitt
-      const fmt = v => (v>=0?'+':'') + n.format(Math.round(v)) + ' kr';
-      d7El.textContent  = fmt(profitSeries[7]);
-      d14El.textContent = fmt(profitSeries[14]);
-      d21El.textContent = fmt(profitSeries[21]);
-      d28El.textContent = fmt(profitSeries[28]);
+      // Maks info
+      capreachEl.textContent = sim.capDay ? `${sim.capDay.toLocaleString('no-NO')} dager` : 'ikke innen perioden';
+      maxdailyEl.textContent = n.format(MAX_M2 * gramsPerSetPerDay * pricePerGram) + ' kr';
 
-      // Oppdater graf
+      // Marker BE-punkt
+      const beIndex = sim.beDays ? Math.min(sim.labels.length-1, Math.max(0, Math.round(sim.beDays))) : null;
+      const pointR = sim.profit.map(()=>0);
+      if(beIndex !== null) pointR[beIndex] = 5;
+
       const c = ensureChart();
-      c.data.labels = days;
-      c.data.datasets[0].data = profitSeries;
+      c.data.labels = sim.labels;
+      c.data.datasets[0].label = reinvest ? 'Akkumulert profitt (med reinvest)' : 'Akkumulert profitt (uten reinvest)';
+      c.data.datasets[0].data = sim.profit;
+      c.data.datasets[0].pointRadius = pointR; // prikk ved break-even
       c.update();
     }
 
