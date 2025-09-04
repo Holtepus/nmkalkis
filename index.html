@@ -7,16 +7,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
   :root{
-    --bg:#0e0e0e;
-    --panel:#191919;
-    --row:#222;
-    --row-alt:#1e1e1e;
-    --line:#313131;
-    --text:#e6e6e6;
-    --muted:#bfbfbf;
-    --orange:#c87200;
-    --orange-dark:#9d5b00;
-    --green:#4caf50;
+    --bg:#0e0e0e; --panel:#191919; --row:#222; --row-alt:#1e1e1e;
+    --line:#313131; --text:#e6e6e6; --muted:#bfbfbf;
+    --orange:#c87200; --orange-dark:#9d5b00; --green:#4caf50;
   }
   html,body{background:var(--bg); color:var(--text); margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Noto Sans","Helvetica Neue",Arial;}
   .wrap{max-width:820px; margin:0 auto 60px; padding:0 16px;}
@@ -30,7 +23,7 @@
   .cell:nth-child(2n){ background:var(--row-alt); }
   .label{ color:#d7d7d7; }
   .value{ font-weight:700; }
-  .muted{ color:var(--muted); font-weight:600; }
+  .muted{ color:#bfbfbf; font-weight:600; }
 
   input[type="number"]{ width:160px; max-width:100%; background:#101010; color:#f2f2f2; border:1px solid #3a3a3a; border-radius:4px; padding:7px 9px; outline:none;}
   input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
@@ -155,7 +148,7 @@
       <div class="chart-wrap">
         <canvas id="profitChart" aria-label="Profittgraf" role="img"></canvas>
       </div>
-      <div class="hint">Grafen viser akkumulert egenkapital (kontanter + verdi av settene − startinvestering) over 0–30 dager. Med reinvest blir kurven konveks/økende.</div>
+      <div class="hint">Grafen viser akkumulert <b>profitt</b> (inntekt − investering) over 0–30 dager. Med reinvest blir kurven konveks/økende.</div>
     </section>
 
   </div>
@@ -167,7 +160,6 @@
     const PRICE_M2 = 43500;
     const SET_COST = PRICE_M2 + 2*PRICE_WORKER; // 1 m² + 2 arbeidere
     const MAX_M2 = 400000;
-
     const n = new Intl.NumberFormat('no-NO');
 
     // --- Elementer (K1)
@@ -202,7 +194,6 @@
       const m2 = sets;
       const workers = sets*2;
       const leftover = money - sets*SET_COST;
-
       outArbeidereEl.textContent = n.format(workers);
       outM2El.textContent = n.format(m2);
       outOversEl.textContent = n.format(leftover) + ' kr';
@@ -214,7 +205,6 @@
       const missM2 = Math.max(0, MAX_M2 - curM2);
       const missWorkers = missM2 * 2;
       const totalCost = missM2 * SET_COST;
-
       outMissM2El.textContent = n.format(missM2);
       outMissWorkersEl.textContent = n.format(missWorkers);
       outManglerEl.textContent = n.format(totalCost) + ' kr';
@@ -227,7 +217,7 @@
       const ctx = document.getElementById('profitChart');
       chart = new Chart(ctx,{
         type:'line',
-        data:{ labels:[], datasets:[{ label:'Akkumulert egenkapital', data:[], tension:.2 }]},
+        data:{ labels:[], datasets:[{ label:'Akkumulert profitt', data:[], tension:.2 }]},
         options:{
           responsive:true,
           plugins:{ legend:{ display:false }},
@@ -237,63 +227,70 @@
       return chart;
     }
 
+    // RIKTIG break-even + reinvestering
     function calcK3(){
       const m2 = Math.max(0, +roiSizeEl.value || 0);
       const pricePerGram = Math.max(0, +prisGramEl.value || 0);
       const gramsPerSetPerDay = Math.max(0, +yieldEl.value || 0);
       const doReinvest = reinvestEl.checked;
 
-      // Start-setup
-      let sets = m2;
-      const initialInvest = sets * SET_COST;
-      const baseDailyIncome = sets * gramsPerSetPerDay * pricePerGram;
+      let sets = m2;                         // 1 m² = 1 sett
+      const invest = sets * SET_COST;        // startinvestering
+      investEl.textContent = n.format(invest) + ' kr';
 
-      investEl.textContent = n.format(initialInvest) + ' kr';
-      dagligEl.textContent = n.format(baseDailyIncome) + ' kr';
+      const baseDaily = sets * gramsPerSetPerDay * pricePerGram;
+      dagligEl.textContent = n.format(baseDaily) + ' kr';
 
       const days = Array.from({length:31}, (_,i)=>i);
-      const equitySeries = [];
-      let cash = 0;
+      const profitSeries = [];
+
+      let cash = 0;          // kontanter for reinvestering
+      let cumRevenue = 0;    // akkumulert inntekt (for BE)
+      let beDays = null;     // desimal-dager til break-even
 
       for(let d=0; d<=30; d++){
         if(d>0){
-          // inntekt denne dagen basert på antall sett ved dagens start
-          const dailyIncome = sets * gramsPerSetPerDay * pricePerGram;
-          cash += dailyIncome;
+          const income = sets * gramsPerSetPerDay * pricePerGram;
+          cumRevenue += income;
+          cash += income;
 
-          if(doReinvest){
-            // kjøp så mange nye sett som mulig ved dagens slutt
-            if(cash >= SET_COST){
-              const buy = Math.floor(cash / SET_COST);
-              sets += buy;
-              cash -= buy * SET_COST;
-            }
+          // kjøp nye sett på slutten av dagen
+          if(doReinvest && cash >= SET_COST){
+            const buy = Math.floor(cash / SET_COST);
+            sets += buy;
+            cash -= buy * SET_COST;
+          }
+
+          // første gang inntekt >= investering -> break-even (interpolert)
+          if(beDays === null && cumRevenue >= invest){
+            const prevCum = cumRevenue - income;
+            const remain = invest - prevCum;
+            const frac = remain / income;
+            beDays = (d - 1) + frac;
           }
         }
-        // Egenkapital = kontanter + verdien av settene - startinvestering
-        const equity = cash + sets*SET_COST - initialInvest;
-        equitySeries.push(equity);
+        profitSeries.push(cumRevenue - invest); // profitt = inntekt - investering
       }
 
-      // Break-even (første dag egenkapital ≥ 0)
+      // Break-even tekst
       let beText = '–';
-      const beDayIdx = equitySeries.findIndex(v => v >= 0);
-      if(beDayIdx > -1){
-        beText = beDayIdx < 1 ? 'under 1 dag' : `${beDayIdx} dager`;
+      if(beDays !== null){
+        beText = beDays < 0.5 ? 'under 1 dag'
+                              : `${(Math.round(beDays*10)/10).toLocaleString('no-NO')} dager`;
       }
       beEl.textContent = beText;
 
-      // Tall-bokser
-      function fmt(v){ return (v>=0?'+':'') + n.format(Math.round(v)) + ' kr'; }
-      d7El.textContent  = fmt(equitySeries[7]);
-      d14El.textContent = fmt(equitySeries[14]);
-      d21El.textContent = fmt(equitySeries[21]);
-      d28El.textContent = fmt(equitySeries[28]);
+      // 7/14/21/28-dagers profitt
+      const fmt = v => (v>=0?'+':'') + n.format(Math.round(v)) + ' kr';
+      d7El.textContent  = fmt(profitSeries[7]);
+      d14El.textContent = fmt(profitSeries[14]);
+      d21El.textContent = fmt(profitSeries[21]);
+      d28El.textContent = fmt(profitSeries[28]);
 
       // Oppdater graf
       const c = ensureChart();
       c.data.labels = days;
-      c.data.datasets[0].data = equitySeries;
+      c.data.datasets[0].data = profitSeries;
       c.update();
     }
 
