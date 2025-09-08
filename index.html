@@ -15,6 +15,73 @@
   .wrap{max-width:820px; margin:0 auto 60px; padding:0 16px;}
   .hero{height:180px; width:100%; object-fit:cover; display:block; border-left:1px solid #603800; border-right:1px solid #603800;}
   .wrap:first-of-type{ margin-bottom:0; }
+  .wrap {
+  max-width:820px;
+  margin:0 auto 60px;
+  padding:0 16px;
+}
+.wrap:first-of-type {
+  margin-bottom:0;
+}
+
+.banner-wrap {
+  position: relative;
+}
+
+.hero {
+  height:180px;
+  width:100%;
+  object-fit:cover;
+  display:block;
+  border-left:1px solid #603800;
+  border-right:1px solid #603800;
+}
+
+/* Gjenbruker overlay-stilene */
+.banner-links {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  gap: 14px;
+  background: rgba(0,0,0,0.55);
+  padding: 6px 10px;
+  border-radius: 10px 0 0 0;
+  border: 1px solid rgba(0,0,0,0.32);
+}
+.banner-links a {
+  font-size: 14px;
+  color: #D6D2D2;
+  font-weight: 600;
+  text-decoration: none;
+}
+.banner-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.banner-credit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: rgba(0,0,0,0.55);
+  padding: 6px 10px;
+  border-radius: 0 6px 0 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  font-weight: 600;
+  font-size: 14px;
+  color: #ddd;
+}
+.banner-credit a {
+  color: #1875c5;
+  text-decoration: none;
+  font-weight: 700;
+}
+.banner-credit a:hover {
+  text-decoration: underline;
+  color: #80c0ff;
+}
+
 
   .section{ background:var(--panel); border:1px solid var(--line); margin:22px 0; box-shadow:0 1px 0 #000 inset, 0 0 10px rgba(0,0,0,.25);}
   .section>.bar{ background:linear-gradient(#9e6822,#9c5400,#9e6822); padding:8px 14px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; border-bottom:1px solid #603800;}
@@ -45,11 +112,19 @@
 </style>
 </head>
 <body>
-  <div class="wrap">
+<div class="wrap">
+  <div class="banner-wrap">
     <img class="hero" src="https://i.imgur.com/CENSpIb.png" alt="Weedfarm">
-  </div>
 
-  <div class="wrap">
+    <div class="banner-links">
+      <a href="https://nmprofilmaker.netlify.app/" target="_blank">Profilmaker</a>
+    </div>
+
+    <div class="banner-credit">
+      Laget av <a href="https://nordicmafia.org/index.php?p=profile&id=2181" target="_blank">Pixie Design</a>
+    </div>
+  </div>
+</div>
 
     <!-- Kalkulator 1 -->
     <section class="section" id="k1">
@@ -313,3 +388,4 @@
   </script>
 </body>
 </html>
+
