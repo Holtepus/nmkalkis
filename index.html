@@ -291,40 +291,33 @@
   const maxdailyEl = document.getElementById('maxdaily');
 
   // -------- Splash-tekster (legg til/flere endre her) --------
+(function(){
   const splashEl = document.getElementById('splash');
+  if (!splashEl) return;
+
+  // Viktig: komma mellom hvert element, og bruk rette " eller ' sitattegn
   const splashMessages = [
-    "Punching trees!",
-    "100% organisk!",
-    "Maks effektivitet!",
-    "Nyt lukta av profit!",
-    "Terra-former økonomien!",
-    "Ikke spis den!",
-    "Mere jord, mere moro!",
-    "CHET suger!",
-    "Gress, ikke stress!",
-    "Plantekraft!"
-        "Plantekraft!"
-      "Husker du nmkalkis?"
-      "Rest in Peace Pixie!"
-      "Støtt din lokale picmaker"
-      "Er du aktiv i forumet?"
-      "Erik er fuckings good guy!"
-      "Hard pikk, folkeskikk!"
-      "BUMP :p:.pp:P:P"
-      "Selger poeng for natura..."
-      "Gi penger til nestemann"
-      "For deg som ikke kan matte"
-      "Oi!"
-      "Plantekraft!"
+  "Husker du nmkalkis?",
+  "Rest in Peace Pixie!",
+  "Støtt din lokale picmaker",
+  "Er du aktiv i forumet?",
+  "Erik er fuckings good guy!",
+  "Hard pikk, folkeskikk!",
+  "BUMP :p:.pp:P:P",
+  "Selger poeng for natura...",
+  "Gi penger til nestemann",
+  "For deg som ikke kan matte",
+  "Oi!"
   ];
+
   function pickRandomSplash(){
-    if(!splashEl) return;
-    const msg = splashMessages[Math.floor(Math.random()*splashMessages.length)];
-    splashEl.textContent = msg;
+    const i = Math.floor(Math.random() * splashMessages.length);
+    splashEl.textContent = splashMessages[i];
   }
-  // ny melding ved last – og trykk for å “rerolle”
+
   pickRandomSplash();
-  splashEl?.addEventListener('click', pickRandomSplash);
+  splashEl.addEventListener('click', pickRandomSplash);
+})();
 
   // Kalkulator 1
   function calcK1(){
@@ -464,3 +457,4 @@
 </script>
 </body>
 </html>
+
