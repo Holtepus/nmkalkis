@@ -40,7 +40,7 @@
     position:absolute;
     top:70%;               /* posisjon i banneret */
     left:50%;
-    transform:translateX(-3%) rotate(-12deg);
+    transform:translateX(-50%) rotate(-12deg);
     z-index:3;
     padding:6px 12px;
     font-weight:900;
@@ -61,9 +61,14 @@
     animation: splashPulse 2.4s ease-in-out infinite;
     will-change: transform;
   }
-  @keyframes splashPulse {
-    0%,100% { transform:translateX(-50%) rotate(-12deg) scale(1); }
-    50%     { transform:translateX(-50%) rotate(-12deg) scale(1.07); }
+@keyframes splashPulse {
+  0%,100% {
+    transform: translateX(-50%) rotate(-12deg) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) rotate(4deg) scale(1.07); /* -12° + 16° = +4° */
+  }
+}
   }
   /* mindre bevegelse hvis brukeren foretrekker redusert animasjon */
   @media (prefers-reduced-motion: reduce){
@@ -457,5 +462,6 @@
 </script>
 </body>
 </html>
+
 
 
