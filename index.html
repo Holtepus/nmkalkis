@@ -16,72 +16,106 @@
   .hero{height:180px; width:100%; object-fit:cover; display:block; border-left:1px solid #603800; border-right:1px solid #603800;}
   .wrap:first-of-type{ margin-bottom:0; }
   .wrap {
-  max-width:820px;
-  margin:0 auto 60px;
-  padding:0 16px;
-}
-.wrap:first-of-type {
-  margin-bottom:0;
-}
+    max-width:820px;
+    margin:0 auto 60px;
+    padding:0 16px;
+  }
+  .wrap:first-of-type { margin-bottom:0; }
 
-.banner-wrap {
-  position: relative;
-}
+  .banner-wrap {
+    position: relative;
+  }
 
-.hero {
-  height:180px;
-  width:100%;
-  object-fit:cover;
-  display:block;
-  border-left:1px solid #603800;
-  border-right:1px solid #603800;
-}
+  .hero {
+    height:180px;
+    width:100%;
+    object-fit:cover;
+    display:block;
+    border-left:1px solid #603800;
+    border-right:1px solid #603800;
+  }
 
-/* Gjenbruker overlay-stilene */
-.banner-links {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  gap: 14px;
-  background: rgba(0,0,0,0.55);
-  padding: 6px 10px;
-  border-radius: 10px 0 0 0;
-  border: 1px solid rgba(0,0,0,0.32);
-}
-.banner-links a {
-  font-size: 14px;
-  color: #D6D2D2;
-  font-weight: 600;
-  text-decoration: none;
-}
-.banner-links a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
+  /* --------- SPLASH (Minecraft-style) --------- */
+  .splash {
+    position:absolute;
+    top:14px;               /* posisjon i banneret */
+    left:50%;
+    transform:translateX(-50%) rotate(-12deg);
+    z-index:3;
+    padding:6px 12px;
+    font-weight:900;
+    font-size:22px;         /* skaler etter smak */
+    line-height:1;
+    color:#ffd800;          /* gul */
+    text-shadow:
+      -2px -2px 0 #000,
+       2px -2px 0 #000,
+      -2px  2px 0 #000,
+       2px  2px 0 #000,
+      0 -2px 0 #000,
+      0  2px 0 #000,
+     -2px  0   0 #000,
+      2px  0   0 #000;      /* svart outline */
+    white-space:nowrap;
+    cursor:default;
+    animation: splashPulse 2.4s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes splashPulse {
+    0%,100% { transform:translateX(-50%) rotate(-12deg) scale(1); }
+    50%     { transform:translateX(-50%) rotate(-12deg) scale(1.07); }
+  }
+  /* mindre bevegelse hvis brukeren foretrekker redusert animasjon */
+  @media (prefers-reduced-motion: reduce){
+    .splash{ animation:none; }
+  }
 
-.banner-credit {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  background: rgba(0,0,0,0.55);
-  padding: 6px 10px;
-  border-radius: 0 6px 0 0;
-  border: 1px solid rgba(255,255,255,0.12);
-  font-weight: 600;
-  font-size: 14px;
-  color: #ddd;
-}
-.banner-credit a {
-  color: #1875c5;
-  text-decoration: none;
-  font-weight: 700;
-}
-.banner-credit a:hover {
-  text-decoration: underline;
-  color: #80c0ff;
-}
+  /* Gjenbruker overlay-stilene */
+  .banner-links {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    gap: 14px;
+    background: rgba(0,0,0,0.55);
+    padding: 6px 10px;
+    border-radius: 10px 0 0 0;
+    border: 1px solid rgba(0,0,0,0.32);
+    z-index:2;
+  }
+  .banner-links a {
+    font-size: 14px;
+    color: #D6D2D2;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .banner-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
 
+  .banner-credit {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,0.55);
+    padding: 6px 10px;
+    border-radius: 0 6px 0 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    font-weight: 600;
+    font-size: 14px;
+    color: #ddd;
+    z-index:2;
+  }
+  .banner-credit a {
+    color: #1875c5;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .banner-credit a:hover {
+    text-decoration: underline;
+    color: #80c0ff;
+  }
 
   .section{ background:var(--panel); border:1px solid var(--line); margin:22px 0; box-shadow:0 1px 0 #000 inset, 0 0 10px rgba(0,0,0,.25);}
   .section>.bar{ background:linear-gradient(#9e6822,#9c5400,#9e6822); padding:8px 14px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; border-bottom:1px solid #603800;}
@@ -108,6 +142,9 @@
   @media (max-width:640px){
     .grid{ grid-template-columns:1fr; }
     .cell:nth-child(2n){ background:var(--row); }
+
+    /* litt mindre splash på mobil */
+    .splash{ font-size:18px; top:10px; }
   }
 </style>
 </head>
@@ -115,6 +152,9 @@
 <div class="wrap">
   <div class="banner-wrap">
     <img class="hero" src="https://i.imgur.com/31wtjXx.png" alt="Weedfarm">
+
+    <!-- Splash-melding -->
+    <div class="splash" id="splash" aria-live="polite"></div>
 
     <div class="banner-links">
       <a href="https://nmprofilmaker.netlify.app/" target="_blank">Profilmaker</a>
@@ -126,270 +166,301 @@
     </div>
   </div>
 
-    <!-- Kalkulator 1 -->
-    <section class="section" id="k1">
-      <div class="bar">Hasjplantasje Kalkulator</div>
-      <div class="grid">
-        <div class="cell"><span class="label">Pris pr. arbeider:</span></div>
-        <div class="cell"><span class="value">17&nbsp;600 kr</span></div>
+  <!-- Kalkulator 1 -->
+  <section class="section" id="k1">
+    <div class="bar">Hasjplantasje Kalkulator</div>
+    <div class="grid">
+      <div class="cell"><span class="label">Pris pr. arbeider:</span></div>
+      <div class="cell"><span class="value">17&nbsp;600 kr</span></div>
 
-        <div class="cell"><span class="label">Pris pr. m²:</span></div>
-        <div class="cell"><span class="value">43&nbsp;500 kr</span></div>
+      <div class="cell"><span class="label">Pris pr. m²:</span></div>
+      <div class="cell"><span class="value">43&nbsp;500 kr</span></div>
 
-        <div class="cell"><label for="penger" class="label">Penger tilgjengelig:</label></div>
-        <div class="cell"><input id="penger" type="number" inputmode="numeric" min="0" step="1000" placeholder="0" /></div>
+      <div class="cell"><label for="penger" class="label">Penger tilgjengelig:</label></div>
+      <div class="cell"><input id="penger" type="number" inputmode="numeric" min="0" step="1000" placeholder="0" /></div>
 
-        <div class="cell"><span class="label">Arbeidere:</span></div>
-        <div class="cell"><span class="value" id="outArbeidere">0</span> <span class="muted">stk</span></div>
+      <div class="cell"><span class="label">Arbeidere:</span></div>
+      <div class="cell"><span class="value" id="outArbeidere">0</span> <span class="muted">stk</span></div>
 
-        <div class="cell"><span class="label">Kvadratmeter:</span></div>
-        <div class="cell"><span class="value" id="outM2">0</span> <span class="muted">m²</span></div>
+      <div class="cell"><span class="label">Kvadratmeter:</span></div>
+      <div class="cell"><span class="value" id="outM2">0</span> <span class="muted">m²</span></div>
 
-        <div class="cell"><span class="label">Penger til overs:</span></div>
-        <div class="cell"><span class="value" id="outOvers">0 kr</span></div>
-      </div>
-      <div class="hint">For maks effektivitet brukes <strong>1 m² : 2 arbeidere</strong>. Kalkulatoren kjøper kun hele sett.</div>
-    </section>
+      <div class="cell"><span class="label">Penger til overs:</span></div>
+      <div class="cell"><span class="value" id="outOvers">0 kr</span></div>
+    </div>
+    <div class="hint">For maks effektivitet brukes <strong>1 m² : 2 arbeidere</strong>. Kalkulatoren kjøper kun hele sett.</div>
+  </section>
 
-    <!-- Kalkulator 2 -->
-    <section class="section" id="k2">
-      <div class="bar">Maks størrelse plantasje</div>
-      <div class="grid">
-        <div class="cell"><label for="nåM2" class="label">Nåværende størrelse:</label></div>
-        <div class="cell">
-          <input id="nåM2" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /> <span class="muted">m²</span>
-        </div>
-
-        <div class="cell"><span class="label">Mangler m²:</span></div>
-        <div class="cell"><span class="value" id="outMissM2">0</span> <span class="muted">m²</span></div>
-
-        <div class="cell"><span class="label">Mangler arbeidere:</span></div>
-        <div class="cell"><span class="value" id="outMissWorkers">0</span> <span class="muted">stk</span></div>
-
-        <div class="cell"><span class="label">Mangler:</span></div>
-        <div class="cell"><span class="value" id="outMangler">0 kr</span></div>
-      </div>
-      <div class="hint">Regner hvor mye (m², arbeidere og total kostnad) som mangler for å nå <strong>400&nbsp;000 m²</strong> med 1:2-ratio.</div>
-    </section>
-
-    <!-- Kalkulator 3 -->
-    <section class="section" id="k3">
-      <div class="bar">Avkastning &amp; Break-even</div>
-      <div class="grid">
-        <div class="cell"><label for="roisize" class="label">Plantasje størrelse:</label></div>
-        <div class="cell">
-          <input id="roisize" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /> <span class="muted">m²</span>
-        </div>
-
-        <div class="cell"><label for="prisGram" class="label">Pris per gram:</label></div>
-        <div class="cell">
-          <input id="prisGram" type="number" inputmode="numeric" min="0" step="1" value="85" /> <span class="muted">kr</span>
-        </div>
-
-        <div class="cell"><label for="yield" class="label">Hasj per døgn (per sett):</label></div>
-        <div class="cell">
-          <input id="yield" type="number" inputmode="numeric" min="0" step="1" value="22" /> <span class="muted">gram</span>
-        </div>
-
-        <div class="cell"><label for="reinvest" class="label">Reinvester i hasj daglig</label></div>
-        <div class="cell"><input id="reinvest" type="checkbox" /></div>
-
-        <div class="cell"><span class="label">Investert (areal + arbeidere):</span></div>
-        <div class="cell"><span class="value" id="invest">0 kr</span></div>
-
-        <div class="cell"><span class="label">Daglig inntekt (brutto):</span></div>
-        <div class="cell"><span class="value" id="daglig">0 kr</span></div>
-
-        <div class="cell"><span class="label">Break-even (estimat):</span></div>
-        <div class="cell"><span class="badge ok" id="breakeven">–</span></div>
-
-        <div class="cell"><span class="label">Maks størrelse nådd:</span></div>
-        <div class="cell"><span class="value" id="capreach">–</span></div>
-
-        <div class="cell"><span class="label">Daglig inntekt ved maks:</span></div>
-        <div class="cell"><span class="value" id="maxdaily">0 kr</span></div>
+  <!-- Kalkulator 2 -->
+  <section class="section" id="k2">
+    <div class="bar">Maks størrelse plantasje</div>
+    <div class="grid">
+      <div class="cell"><label for="nåM2" class="label">Nåværende størrelse:</label></div>
+      <div class="cell">
+        <input id="nåM2" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /> <span class="muted">m²</span>
       </div>
 
-      <div class="chart-wrap">
-        <canvas id="profitChart" aria-label="Profittgraf" role="img"></canvas>
+      <div class="cell"><span class="label">Mangler m²:</span></div>
+      <div class="cell"><span class="value" id="outMissM2">0</span> <span class="muted">m²</span></div>
+
+      <div class="cell"><span class="label">Mangler arbeidere:</span></div>
+      <div class="cell"><span class="value" id="outMissWorkers">0</span> <span class="muted">stk</span></div>
+
+      <div class="cell"><span class="label">Mangler:</span></div>
+      <div class="cell"><span class="value" id="outMangler">0 kr</span></div>
+    </div>
+    <div class="hint">Regner hvor mye (m², arbeidere og total kostnad) som mangler for å nå <strong>400&nbsp;000 m²</strong> med 1:2-ratio.</div>
+  </section>
+
+  <!-- Kalkulator 3 -->
+  <section class="section" id="k3">
+    <div class="bar">Avkastning &amp; Break-even</div>
+    <div class="grid">
+      <div class="cell"><label for="roisize" class="label">Plantasje størrelse:</label></div>
+      <div class="cell">
+        <input id="roisize" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /> <span class="muted">m²</span>
       </div>
-      <div class="hint">Grafen viser akkumulert <b>profitt</b> (inntekt − startinvestering) over en dynamisk tidslinje. Reinvestering stopper automatisk ved <b>400&nbsp;000 m²</b>.</div>
-    </section>
 
-  </div>
+      <div class="cell"><label for="prisGram" class="label">Pris per gram:</label></div>
+      <div class="cell">
+        <input id="prisGram" type="number" inputmode="numeric" min="0" step="1" value="85" /> <span class="muted">kr</span>
+      </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    // --- Konstanter
-    const PRICE_WORKER = 17600;
-    const PRICE_M2 = 43500;
-    const SET_COST = PRICE_M2 + 2*PRICE_WORKER; // 1 m² + 2 arbeidere
-    const MAX_M2 = 400000;
-    const n = new Intl.NumberFormat('no-NO');
+      <div class="cell"><label for="yield" class="label">Hasj per døgn (per sett):</label></div>
+      <div class="cell">
+        <input id="yield" type="number" inputmode="numeric" min="0" step="1" value="22" /> <span class="muted">gram</span>
+      </div>
 
-    // --- Elementer (K1)
-    const pengerEl = document.getElementById('penger');
-    const outArbeidereEl = document.getElementById('outArbeidere');
-    const outM2El = document.getElementById('outM2');
-    const outOversEl = document.getElementById('outOvers');
+      <div class="cell"><label for="reinvest" class="label">Reinvester i hasj daglig</label></div>
+      <div class="cell"><input id="reinvest" type="checkbox" /></div>
 
-    // --- Elementer (K2)
-    const nåM2El = document.getElementById('nåM2');
-    const outMissM2El = document.getElementById('outMissM2');
-    const outMissWorkersEl = document.getElementById('outMissWorkers');
-    const outManglerEl = document.getElementById('outMangler');
+      <div class="cell"><span class="label">Investert (areal + arbeidere):</span></div>
+      <div class="cell"><span class="value" id="invest">0 kr</span></div>
 
-    // --- Elementer (K3)
-    const roiSizeEl = document.getElementById('roisize');
-    const prisGramEl = document.getElementById('prisGram');
-    const yieldEl = document.getElementById('yield');
-    const reinvestEl = document.getElementById('reinvest');
-    const investEl = document.getElementById('invest');
-    const dagligEl = document.getElementById('daglig');
-    const beEl = document.getElementById('breakeven');
-    const capreachEl = document.getElementById('capreach');
-    const maxdailyEl = document.getElementById('maxdaily');
+      <div class="cell"><span class="label">Daglig inntekt (brutto):</span></div>
+      <div class="cell"><span class="value" id="daglig">0 kr</span></div>
 
-    // Kalkulator 1
-    function calcK1(){
-      const money = Math.max(0, +pengerEl.value || 0);
-      const sets = Math.floor(money / SET_COST);
-      outArbeidereEl.textContent = n.format(sets*2);
-      outM2El.textContent = n.format(sets);
-      outOversEl.textContent = n.format(money - sets*SET_COST) + ' kr';
-    }
+      <div class="cell"><span class="label">Break-even (estimat):</span></div>
+      <div class="cell"><span class="badge ok" id="breakeven">–</span></div>
 
-    // Kalkulator 2
-    function calcK2(){
-      const curM2 = Math.max(0, +nåM2El.value || 0);
-      const missM2 = Math.max(0, MAX_M2 - curM2);
-      outMissM2El.textContent = n.format(missM2);
-      outMissWorkersEl.textContent = n.format(missM2*2);
-      outManglerEl.textContent = n.format(missM2*SET_COST) + ' kr';
-    }
+      <div class="cell"><span class="label">Maks størrelse nådd:</span></div>
+      <div class="cell"><span class="value" id="capreach">–</span></div>
 
-    // --- Chart
-    let chart;
-    function ensureChart(){
-      if(chart) return chart;
-      const ctx = document.getElementById('profitChart');
-      chart = new Chart(ctx,{
-        type:'line',
-        data:{ labels:[], datasets:[
-          {label:'Akkumulert profitt', data:[], tension:.2, pointRadius:0}
-        ]},
-        options:{
-          responsive:true,
-          plugins:{ legend:{ display:true }},
-          interaction:{ mode:'index', intersect:false },
-          scales:{ x:{ grid:{ color:'#2a2a2a'}}, y:{ grid:{ color:'#2a2a2a'} } }
-        }
-      });
-      return chart;
-    }
+      <div class="cell"><span class="label">Daglig inntekt ved maks:</span></div>
+      <div class="cell"><span class="value" id="maxdaily">0 kr</span></div>
+    </div>
 
-    // Simuler serie (med/uten reinvest)
-    function simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest){
-      let sets = Math.min(MAX_M2, Math.max(0, m2));
-      const invest = sets * SET_COST;
-      const maxDailyIncome = MAX_M2 * gramsPerSetPerDay * pricePerGram;
+    <div class="chart-wrap">
+      <canvas id="profitChart" aria-label="Profittgraf" role="img"></canvas>
+    </div>
+    <div class="hint">Grafen viser akkumulert <b>profitt</b> (inntekt − startinvestering) over en dynamisk tidslinje. Reinvestering stopper automatisk ved <b>400&nbsp;000 m²</b>.</div>
+  </section>
 
-      const profit = [0];
-      let cash = 0;
-      let cumRevenue = 0;
-      let beDays = null;
-      let capDay = null;
+</div>
 
-      for(let d=1; d<=365; d++){
-        const income = sets * gramsPerSetPerDay * pricePerGram;
-        cumRevenue += income;
-        cash += income;
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // --- Konstanter
+  const PRICE_WORKER = 17600;
+  const PRICE_M2 = 43500;
+  const SET_COST = PRICE_M2 + 2*PRICE_WORKER; // 1 m² + 2 arbeidere
+  const MAX_M2 = 400000;
+  const n = new Intl.NumberFormat('no-NO');
 
-        if(reinvest){
-          // kjøp på slutten av dagen, men aldri over maks
-          if(cash >= SET_COST && sets < MAX_M2){
-            const canBuy = Math.floor(cash / SET_COST);
-            const room = MAX_M2 - sets;
-            const buy = Math.min(canBuy, room);
-            sets += buy;
-            cash -= buy * SET_COST;
-            if(sets === MAX_M2 && capDay === null) capDay = d;
-          }
-        }
+  // --- Elementer (K1)
+  const pengerEl = document.getElementById('penger');
+  const outArbeidereEl = document.getElementById('outArbeidere');
+  const outM2El = document.getElementById('outM2');
+  const outOversEl = document.getElementById('outOvers');
 
-        if(beDays === null && cumRevenue >= invest){
-          const prevCum = cumRevenue - income;
-          const frac = (invest - prevCum) / income; // andel av dagen
-          beDays = (d - 1) + frac;
-        }
+  // --- Elementer (K2)
+  const nåM2El = document.getElementById('nåM2');
+  const outMissM2El = document.getElementById('outMissM2');
+  const outMissWorkersEl = document.getElementById('outMissWorkers');
+  const outManglerEl = document.getElementById('outMangler');
 
-        profit.push(cumRevenue - invest);
+  // --- Elementer (K3)
+  const roiSizeEl = document.getElementById('roisize');
+  const prisGramEl = document.getElementById('prisGram');
+  const yieldEl = document.getElementById('yield');
+  const reinvestEl = document.getElementById('reinvest');
+  const investEl = document.getElementById('invest');
+  const dagligEl = document.getElementById('daglig');
+  const beEl = document.getElementById('breakeven');
+  const capreachEl = document.getElementById('capreach');
+  const maxdailyEl = document.getElementById('maxdaily');
+
+  // -------- Splash-tekster (legg til/flere endre her) --------
+  const splashEl = document.getElementById('splash');
+  const splashMessages = [
+    "Punching trees!",
+    "100% organisk!",
+    "Maks effektivitet!",
+    "Nyt lukta av profit!",
+    "Terra-former økonomien!",
+    "Ikke spis den!",
+    "Mere jord, mere moro!",
+    "CHET suger!",
+    "Gress, ikke stress!",
+    "Plantekraft!"
+        "Plantekraft!"
+      "Husker du nmkalkis?"
+      "Rest in Peace Pixie!"
+      "Støtt din lokale picmaker"
+      "Er du aktiv i forumet?"
+      "Erik er fuckings good guy!"
+      "Hard pikk, folkeskikk!"
+      "BUMP :p:.pp:P:P"
+      "Selger poeng for natura..."
+      "Gi penger til nestemann"
+      "For deg som ikke kan matte"
+      "Oi!"
+      "Plantekraft!"
+  ];
+  function pickRandomSplash(){
+    if(!splashEl) return;
+    const msg = splashMessages[Math.floor(Math.random()*splashMessages.length)];
+    splashEl.textContent = msg;
+  }
+  // ny melding ved last – og trykk for å “rerolle”
+  pickRandomSplash();
+  splashEl?.addEventListener('click', pickRandomSplash);
+
+  // Kalkulator 1
+  function calcK1(){
+    const money = Math.max(0, +pengerEl.value || 0);
+    const sets = Math.floor(money / SET_COST);
+    outArbeidereEl.textContent = n.format(sets*2);
+    outM2El.textContent = n.format(sets);
+    outOversEl.textContent = n.format(money - sets*SET_COST) + ' kr';
+  }
+
+  // Kalkulator 2
+  function calcK2(){
+    const curM2 = Math.max(0, +nåM2El.value || 0);
+    const missM2 = Math.max(0, MAX_M2 - curM2);
+    outMissM2El.textContent = n.format(missM2);
+    outMissWorkersEl.textContent = n.format(missM2*2);
+    outManglerEl.textContent = n.format(missM2*SET_COST) + ' kr';
+  }
+
+  // --- Chart
+  let chart;
+  function ensureChart(){
+    if(chart) return chart;
+    const ctx = document.getElementById('profitChart');
+    chart = new Chart(ctx,{
+      type:'line',
+      data:{ labels:[], datasets:[
+        {label:'Akkumulert profitt', data:[], tension:.2, pointRadius:0}
+      ]},
+      options:{
+        responsive:true,
+        plugins:{ legend:{ display:true }},
+        interaction:{ mode:'index', intersect:false },
+        scales:{ x:{ grid:{ color:'#2a2a2a'}}, y:{ grid:{ color:'#2a2a2a'} } }
       }
-
-      // velg opp til en smidig visningslengde
-      const horizon = Math.min(365, Math.max(60, Math.ceil(((beDays ?? 180)*1.25)+30)));
-      return {
-        labels: Array.from({length: horizon+1}, (_,i)=>i),
-        profit: profit.slice(0, horizon+1),
-        beDays, capDay, invest,
-        baseDaily: (m2 * gramsPerSetPerDay * pricePerGram),
-        maxDaily: maxDailyIncome
-      };
-    }
-
-    function calcK3(){
-      const m2 = Math.max(0, +roiSizeEl.value || 0);
-      const pricePerGram = Math.max(0, +prisGramEl.value || 0);
-      const gramsPerSetPerDay = Math.max(0, +yieldEl.value || 0);
-      const reinvest = reinvestEl.checked;
-
-      const initialInvest = m2 * SET_COST;
-      investEl.textContent = n.format(initialInvest) + ' kr';
-      dagligEl.textContent = n.format(m2 * gramsPerSetPerDay * pricePerGram) + ' kr';
-
-      const sim = simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest);
-
-      // Break-even tekst
-      let beText = '–';
-      if(sim.beDays !== null){
-        beText = sim.beDays < 0.5 ? 'under 1 dag' : `${(Math.round(sim.beDays*10)/10).toLocaleString('no-NO')} dager`;
-      }
-      beEl.textContent = beText;
-
-      // Maks info
-      capreachEl.textContent = sim.capDay ? `${sim.capDay.toLocaleString('no-NO')} dager` : 'ikke innen perioden';
-      maxdailyEl.textContent = n.format(MAX_M2 * gramsPerSetPerDay * pricePerGram) + ' kr';
-
-      // Marker BE-punkt
-      const beIndex = sim.beDays ? Math.min(sim.labels.length-1, Math.max(0, Math.round(sim.beDays))) : null;
-      const pointR = sim.profit.map(()=>0);
-      if(beIndex !== null) pointR[beIndex] = 5;
-
-      const c = ensureChart();
-      c.data.labels = sim.labels;
-      c.data.datasets[0].label = reinvest ? 'Akkumulert profitt (med reinvest)' : 'Akkumulert profitt (uten reinvest)';
-      c.data.datasets[0].data = sim.profit;
-      c.data.datasets[0].pointRadius = pointR; // prikk ved break-even
-      c.update();
-    }
-
-    // Lyttere
-    ['input','change'].forEach(evt=>{
-      pengerEl.addEventListener(evt, calcK1);
-      nåM2El.addEventListener(evt, calcK2);
-      roiSizeEl.addEventListener(evt, calcK3);
-      prisGramEl.addEventListener(evt, calcK3);
-      yieldEl.addEventListener(evt, calcK3);
-      document.getElementById('reinvest').addEventListener(evt, calcK3);
     });
+    return chart;
+  }
 
-    // Første render
-    calcK1(); calcK2(); calcK3();
-  </script>
+  // Simuler serie (med/uten reinvest)
+  function simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest){
+    let sets = Math.min(MAX_M2, Math.max(0, m2));
+    const invest = sets * SET_COST;
+    const maxDailyIncome = MAX_M2 * gramsPerSetPerDay * pricePerGram;
+
+    const profit = [0];
+    let cash = 0;
+    let cumRevenue = 0;
+    let beDays = null;
+    let capDay = null;
+
+    for(let d=1; d<=365; d++){
+      const income = sets * gramsPerSetPerDay * pricePerGram;
+      cumRevenue += income;
+      cash += income;
+
+      if(reinvest){
+        // kjøp på slutten av dagen, men aldri over maks
+        if(cash >= SET_COST && sets < MAX_M2){
+          const canBuy = Math.floor(cash / SET_COST);
+          const room = MAX_M2 - sets;
+          const buy = Math.min(canBuy, room);
+          sets += buy;
+          cash -= buy * SET_COST;
+          if(sets === MAX_M2 && capDay === null) capDay = d;
+        }
+      }
+
+      if(beDays === null && cumRevenue >= invest){
+        const prevCum = cumRevenue - income;
+        const frac = (invest - prevCum) / income; // andel av dagen
+        beDays = (d - 1) + frac;
+      }
+
+      profit.push(cumRevenue - invest);
+    }
+
+    // velg opp til en smidig visningslengde
+    const horizon = Math.min(365, Math.max(60, Math.ceil(((beDays ?? 180)*1.25)+30)));
+    return {
+      labels: Array.from({length: horizon+1}, (_,i)=>i),
+      profit: profit.slice(0, horizon+1),
+      beDays, capDay, invest,
+      baseDaily: (m2 * gramsPerSetPerDay * pricePerGram),
+      maxDaily: maxDailyIncome
+    };
+  }
+
+  function calcK3(){
+    const m2 = Math.max(0, +roiSizeEl.value || 0);
+    const pricePerGram = Math.max(0, +prisGramEl.value || 0);
+    const gramsPerSetPerDay = Math.max(0, +yieldEl.value || 0);
+    const reinvest = reinvestEl.checked;
+
+    const initialInvest = m2 * SET_COST;
+    investEl.textContent = n.format(initialInvest) + ' kr';
+    dagligEl.textContent = n.format(m2 * gramsPerSetPerDay * pricePerGram) + ' kr';
+
+    const sim = simulate(m2, pricePerGram, gramsPerSetPerDay, reinvest);
+
+    // Break-even tekst
+    let beText = '–';
+    if(sim.beDays !== null){
+      beText = sim.beDays < 0.5 ? 'under 1 dag' : `${(Math.round(sim.beDays*10)/10).toLocaleString('no-NO')} dager`;
+    }
+    beEl.textContent = beText;
+
+    // Maks info
+    capreachEl.textContent = sim.capDay ? `${sim.capDay.toLocaleString('no-NO')} dager` : 'ikke innen perioden';
+    maxdailyEl.textContent = n.format(MAX_M2 * gramsPerSetPerDay * pricePerGram) + ' kr';
+
+    // Marker BE-punkt
+    const beIndex = sim.beDays ? Math.min(sim.labels.length-1, Math.max(0, Math.round(sim.beDays))) : null;
+    const pointR = sim.profit.map(()=>0);
+    if(beIndex !== null) pointR[beIndex] = 5;
+
+    const c = ensureChart();
+    c.data.labels = sim.labels;
+    c.data.datasets[0].label = reinvest ? 'Akkumulert profitt (med reinvest)' : 'Akkumulert profitt (uten reinvest)';
+    c.data.datasets[0].data = sim.profit;
+    c.data.datasets[0].pointRadius = pointR; // prikk ved break-even
+    c.update();
+  }
+
+  // Lyttere
+  ['input','change'].forEach(evt=>{
+    pengerEl.addEventListener(evt, calcK1);
+    nåM2El.addEventListener(evt, calcK2);
+    roiSizeEl.addEventListener(evt, calcK3);
+    prisGramEl.addEventListener(evt, calcK3);
+    yieldEl.addEventListener(evt, calcK3);
+    document.getElementById('reinvest').addEventListener(evt, calcK3);
+  });
+
+  // Første render
+  calcK1(); calcK2(); calcK3();
+</script>
 </body>
 </html>
-
-
-
-
-
